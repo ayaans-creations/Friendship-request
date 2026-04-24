@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Friendship Request</title>
+    <style>
+        /* Import a cute, rounded font from Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap');
+
+        /* Global Reset & Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background-color: #ffe6eb; /* Soft pastel pink background */
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden; /* Prevents scrollbars when the button runs away */
+        }
+
+        /* Main Card Layout */
+        .card {
+            background: #ffffff;
+            padding: 3rem 4rem;
+            border-radius: 30px;
+            box-shadow: 0 15px 35px rgba(255, 154, 162, 0.2);
+            text-align: center;
+            z-index: 10;
+            position: relative;
+            max-width: 90%;
+        }
+
+        h1 {
+            color: #ff6b81;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            color: #747d8c;
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Buttons Container */
+        .btn-group {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Button Styling */
+        button {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            padding: 0.8rem 2.5rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            outline: none;
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+            white-space: nowrap;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        #btn-yes {
+            background-color: #2ed573;
+            color: white;
+            box-shadow: 0 8px 20px rgba(46, 213, 115, 0.3);
+        }
+
+        #btn-yes:hover {
+            background-color: #26c267;
+        }
+
+        #btn-no {
+            background-color: #ff4757;
+            color: white;
+            box-shadow: 0 8px 20px rgba(255, 71, 87, 0.3);
+            /* Smooth transition for when it flies away */
+            transition: top 0.25s ease-out, left 0.25s ease-out;
+            z-index: 50; /* Ensures it stays above other elements when moving */
+        }
+
+        /* Modal Overlay & Card Styling */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(255, 230, 235, 0.8);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+            z-index: 100;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background: white;
+            padding: 4rem;
+            border-radius: 30px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            transform: scale(0.8) translateY(20px);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal h2 {
+            color: #ff6b81;
+            font-size: 2.2rem;
+            margin: 0;
+        }
+
+        /* Beating Heart Animation for the Modal */
+        .heart {
+            font-size: 4rem;
+            margin-top: 1.5rem;
+            display: inline-block;
+            animation: heartbeat 1s infinite alternate;
+        }
+
+        @keyframes heartbeat {
+            from { transform: scale(1); }
+            to { transform: scale(1.2); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main Content -->
+    <div class="card">
+        <h1 id="title">Friend, be my friend!</h1>
+        <p>hey, become my freind you are sooo cute and pretty, let's become my freind you will be my bestie</p>
+        <p>Do you want to be my friend or no?</p>
+        <div class="btn-group">
+            <button id="btn-yes">Yes</button>
+            <button id="btn-no">No</button>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal">
+            <h2 id="modal-text">You are now my best best best best best best friend!</h2>
+            <div class="heart">❤️</div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // DOM Elements
+            const titleEl = document.getElementById("title");
+            const modalTextEl = document.getElementById("modal-text");
+            const btnYes = document.getElementById("btn-yes");
+            const btnNo = document.getElementById("btn-no");
+            const modal = document.getElementById("modal");
+
+            let userName = "";
+
+            // Ask for name on load
+            setTimeout(() => {
+                userName = prompt("Hello there! What's your name?");
+                
+                // Fallback for empty names
+                if (!userName || userName.trim() === "") {
+                    userName = "Mysterious Stranger";
+                } else {
+                    userName = userName.trim();
+                }
+
+                // Update text
+                titleEl.innerText = `${userName}, be my friend!`;
+                modalTextEl.innerText = `You are now my best best best best best friend, ${userName}!`;
+            }, 100);
+
+            // Function to make the "No" button run away randomly within the screen
+            const runAway = (e) => {
+                // Prevent default behavior if triggered by click/touch
+                if(e) e.preventDefault();
+
+                // Change to fixed positioning so it moves relative to the whole screen
+                if (btnNo.style.position !== 'fixed') {
+                    btnNo.style.width = btnNo.offsetWidth + 'px';
+                    btnNo.style.height = btnNo.offsetHeight + 'px';
+                    btnNo.style.position = 'fixed';
+                }
+
+                // Calculate safe boundaries so it doesn't go off-screen
+                const safeMargin = 20;
+                const maxX = window.innerWidth - btnNo.offsetWidth - safeMargin;
+                const maxY = window.innerHeight - btnNo.offsetHeight - safeMargin;
+
+                // Generate random X and Y coordinates within screen bounds
+                const randomX = Math.max(safeMargin, Math.floor(Math.random() * maxX));
+                const randomY = Math.max(safeMargin, Math.floor(Math.random() * maxY));
+
+                // Apply new coordinates
+                btnNo.style.left = randomX + "px";
+                btnNo.style.top = randomY + "px";
+            };
+
+            // Function to show the success pop-up
+            const acceptFriendship = () => {
+                modal.classList.add("active");
+            };
+
+            // --- EVENT LISTENERS --- //
+
+            // 1. "Yes" button simply accepts friendship
+            btnYes.addEventListener("click", acceptFriendship);
+
+            // 2. Making the "No" button unclickable
+            btnNo.addEventListener("mouseenter", runAway); // For Desktop mouse hover
+            btnNo.addEventListener("focus", runAway);      // For keyboard accessibility trickery
+            btnNo.addEventListener("click", runAway);      // Infinite clicking evasion
+            btnNo.addEventListener("touchstart", runAway); // Infinite tapping evasion for mobile
+        });
+    </script>
+</body>
+</html>
